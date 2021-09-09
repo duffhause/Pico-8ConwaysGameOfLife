@@ -5,7 +5,7 @@ DEBUG = false
 
 function _init()
 	-- Create grid
-	g = create_grid(128, 128)
+	g = create_grid(31, 28)
 
 	-- Create cursor
 	c = {0,0}
@@ -13,35 +13,66 @@ function _init()
 
 	-- Create timer
 	t = 0
+	game_speed = 5
 	paused = true
+
+	-- Create offsets
+	xOff, yOff = 2, 0
+	cell_size = 4
 end
 
 function _draw()
-	-- Clear screen
 	cls()
-
-	-- Draw tiles
-	for i = 1,g.x do
-		for ii = 1,g.y do
-			if (g[i][ii]) pset(i-1, ii-1, 7)
-		end
-	end
-
-	-- Draw cursor
-	if (c.show) pset(c[1], c[2], 10)
+	draw_grid()
+	if (paused) draw_cursor()
+	draw_hud()
 end
 
 function _update()
 	t += 1
-	c.show = not c.show
-	move_cursor()
-	click_cursor()
+	if paused then
+		c.show = not c.show
+		move_cursor()
+		click_cursor()
+	end
 
 	if (btnp(4)) paused = not paused
 	
-	if t > 15 and not paused then
+	if t > game_speed and not paused then
 		update_grid()
 		t = 0
+	end
+end
+
+function draw_cursor()
+	if c.show then
+		local cx, cy = (c[1]*cell_size)+xOff, (c[2]*cell_size)+yOff	-- Calculate x and y to draw cursor 
+		rectfill(cx+1, cy+1, cx+cell_size-1, cy+cell_size-1, 11)	-- Draw cursor
+	end
+end
+
+function draw_grid()
+	for i = 1, g.x do
+		for ii = 1, g.y do
+			local x, y = ((i-1)*cell_size) + xOff, ((ii-1)*cell_size) + yOff	-- Calculate x and y for cell
+			rect(x, y, x+cell_size, y+cell_size, 1) 				-- Draw box for grid
+			if (g[i][ii]) rectfill(x+1, y+1, x+cell_size-1, y+cell_size-1, 7)	-- Draw box if live cell
+			
+		end
+	end
+end
+
+function draw_hud()
+	-- Draw background
+	rectfill(2,117,126,127, 1)
+	rect	(2,117,126,127, 7)
+	
+	if not DEBUG then
+		print("🅾️" .. (paused and "play" or "pause"), 5, 120, 7)
+		if (paused) print("❎toggle cell", 37, 120)
+	else
+		print(stat(1).."cpu ", 5, 120, 7)
+		print(stat(7) .. "fps ", 64, 120)
 	end
 end
 
@@ -50,8 +81,8 @@ function update_grid()
 	for i = 1, g.x do
 		for ii = 1, g.y do
 			local n = get_neighbours(i, ii)
-			if ((n == 2 or n == 3) and g[i][ii]) next[i][ii] = true
-			if (n == 3 and not g[i][ii]) next[i][ii] = true
+			if ((n == 2 or n == 3) and g[i][ii]) next[i][ii] = true	-- If cell has 2 or 3 neighbours then it survives
+			if (n == 3 and not g[i][ii]) next[i][ii] = true		-- If cell is dead but has 3 live neighbours then repopulate
 		end
 	end
 	
@@ -61,6 +92,7 @@ end
 function get_neighbours(x, y)
 	local n = 0
 	
+	-- Need to check if the cell is missing neighbours due to grid limitation
 	local has_left = x > 1
 	local has_right = x < g.x
 	local has_top = y > 1
@@ -86,8 +118,8 @@ function get_neighbours(x, y)
 end
 
 function click_cursor()
-	local x,y = c[1], c[2]
-	if (btnp(5)) g[x+1][y+1] = not g[x+1][y+1]
+	local x, y = c[1], c[2]
+	if (btnp(5)) g[x+1][y+1] = not g[x+1][y+1] -- Toggle cell if click
 end
 
 function move_cursor()
