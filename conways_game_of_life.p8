@@ -5,10 +5,7 @@ DEBUG = false
 
 function _init()
 	-- Create grid
-	g = {}
-	g.x = 128
-	g.y = 128
-	g = create_grid(g.x, g.y, g)
+	g = create_grid(128, 128)
 
 	-- Create cursor
 	c = {0,0}
@@ -17,7 +14,6 @@ function _init()
 	-- Create timer
 	t = 0
 	paused = true
-	fps = stat(7)
 end
 
 function _draw()
@@ -27,16 +23,12 @@ function _draw()
 	-- Draw tiles
 	for i = 1,g.x do
 		for ii = 1,g.y do
-			if g[i][ii] then pset(i-1, ii-1, 7) end
+			if (g[i][ii]) pset(i-1, ii-1, 7)
 		end
 	end
 
 	-- Draw cursor
-	if c.show then -- Every other frame
-		pset(c[1], c[2], 10)
-	end
-
-	print(tostr(paused), 0, 120, 10)
+	if (c.show) pset(c[1], c[2], 10)
 end
 
 function _update()
@@ -54,10 +46,10 @@ function _update()
 end
 
 function update_grid()
-	next = create_grid(g.x, g.y, {})
-	for i = 1,g.x do
-		for ii = 1,g.y do
-			local n = get_neighbours(i,ii)
+	next = create_grid(g.x, g.y)
+	for i = 1, g.x do
+		for ii = 1, g.y do
+			local n = get_neighbours(i, ii)
 			if ((n == 2 or n == 3) and g[i][ii]) next[i][ii] = true
 			if (n == 3 and not g[i][ii]) next[i][ii] = true
 		end
@@ -76,17 +68,17 @@ function get_neighbours(x, y)
 
 	if has_top then
 		if (has_left) then  if (g[x-1][y-1]) then  n += 1 end end	-- Top left
-		if (g[x][y-1]) n += 1					--Top Middle
+		if (g[x][y-1]) n += 1						-- Top Middle
 		if (has_right) then if (g[x+1][y-1]) then  n += 1 end end	-- Top right
 	end
 
-	if (has_left) then if (g[x-1][y]) then n += 1 end end --Middle left
-	if (has_right) then if (g[x+1][y]) then n += 1 end end --Middle right
+	if (has_left) then if (g[x-1][y]) then n += 1 end end			-- Middle left
+	if (has_right) then if (g[x+1][y]) then n += 1 end end			-- Middle right
 
 	
 	if has_bottom then
-		if (has_left) then if (g[x-1][y+1]) then n += 1 end end	-- Top left
-		if (g[x][y+1]) n += 1			--Top Middle
+		if (has_left) then if (g[x-1][y+1]) then n += 1 end end		-- Top left
+		if (g[x][y+1]) n += 1						-- Top Middle
 		if (has_right) then if (g[x+1][y+1]) then n += 1 end end	-- Top right
 	end
 
@@ -106,15 +98,15 @@ function move_cursor()
 end
 
 
-function create_grid(x, y, grid)
+function create_grid(x, y)
+	local grid = {}
+	grid.x, grid.y = x, y
 	for i = 1, x do
 		grid[i] = {}
 		for ii = 1, y do
 			grid[i][ii] = false
 		end
 	end
-	grid.x = x
-	grid.y = y
 	return grid
 end
 __gfx__
