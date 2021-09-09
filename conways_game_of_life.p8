@@ -56,7 +56,7 @@ function draw_grid()
 		for ii = 1, g.y do
 			local x, y = ((i-1)*cell_size) + xOff, ((ii-1)*cell_size) + yOff	-- Calculate x and y for cell
 			rect(x, y, x+cell_size, y+cell_size, 1) 				-- Draw box for grid
-			if (g[i][ii]) rectfill(x+1, y+1, x+cell_size-1, y+cell_size-1, 7)	-- Draw box if live cell
+			if (g[i][ii]) rectfill(x+1, y+1, x+cell_size-1, y+cell_size-1, 7)	-- Draw box if cell is alive
 			
 		end
 	end
@@ -100,7 +100,7 @@ function get_neighbours(x, y)
 
 	if has_top then
 		if (has_left) then  if (g[x-1][y-1]) then  n += 1 end end	-- Top left
-		if (g[x][y-1]) n += 1						-- Top Middle
+		if (g[x][y-1]) n += 1						-- Top middle
 		if (has_right) then if (g[x+1][y-1]) then  n += 1 end end	-- Top right
 	end
 
@@ -109,9 +109,9 @@ function get_neighbours(x, y)
 
 	
 	if has_bottom then
-		if (has_left) then if (g[x-1][y+1]) then n += 1 end end		-- Top left
-		if (g[x][y+1]) n += 1						-- Top Middle
-		if (has_right) then if (g[x+1][y+1]) then n += 1 end end	-- Top right
+		if (has_left) then if (g[x-1][y+1]) then n += 1 end end		-- Bottom left
+		if (g[x][y+1]) n += 1						-- Bottom middle
+		if (has_right) then if (g[x+1][y+1]) then n += 1 end end	-- Bottom right
 	end
 
 	return n
@@ -119,7 +119,7 @@ end
 
 function click_cursor()
 	local x, y = c[1], c[2]
-	if (btnp(5)) g[x+1][y+1] = not g[x+1][y+1] -- Toggle cell if click
+	if (btnp(5)) g[x+1][y+1] = not g[x+1][y+1] -- Toggle cell if clicked
 end
 
 function move_cursor()
